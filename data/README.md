@@ -1,13 +1,14 @@
 # Data
 
-**Target dataset (real-data upgrade):** [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii)
-— ~1,067,371 real transactions from a UK online retailer (2009–2011).
+**Dataset:** [UCI Online Retail II](https://archive.ics.uci.edu/dataset/502/online+retail+ii)
+— 1,067,371 real transactions from a UK online retailer (Dec 2009 – Dec 2011).
 
-## How to obtain
-1. Download `online_retail_II.xlsx` from the UCI link above (or the Kaggle mirror).
-2. Place it in this `data/` folder.
-3. Run the notebook — it will clean the data (remove cancellations/returns, negative quantities, missing customer IDs), engineer RFM features per customer, and build a forward-looking 6-month spend target.
+## One-step download
+```bash
+curl -L -o data/online_retail_II.zip "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
+unzip data/online_retail_II.zip -d data/
+```
+This produces `data/online_retail_II.xlsx` (~45 MB, two sheets). The notebook loads both
+sheets, caches a `.pkl` for fast re-runs, and does all cleaning/feature engineering itself.
 
-The raw file is kept out of git via `.gitignore`.
-
-> The currently committed notebook uses a synthetic RFM generator; the real-data version replaces it as described in the repo README roadmap.
+Raw data (`*.xlsx`, `*.zip`, `*.pkl`, `*.csv`) is kept out of git via `.gitignore`.
