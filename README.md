@@ -1,4 +1,4 @@
-# 💷 Predictive Customer Lifetime Value (CLV) Engine
+# Predictive Customer Lifetime Value (CLV) Engine
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![XGBoost](https://img.shields.io/badge/Model-XGBoost-EC4E20)
@@ -14,7 +14,7 @@ Built on the **real [UCI Online Retail II](https://archive.ics.uci.edu/dataset/5
 
 ---
 
-## 📊 Results (measured on a held-out test set)
+## Results (measured on a held-out test set)
 
 | Metric | XGBoost | Linear baseline |
 |--------|--------:|----------------:|
@@ -22,11 +22,11 @@ Built on the **real [UCI Online Retail II](https://archive.ics.uci.edu/dataset/5
 | **R² (test)** | **0.69** | −118 *(fails)* |
 | **5-fold CV R² (log target)** | **0.35 ± 0.03** | — |
 
-**💡 Business impact:** the customers the model ranks in the **top 10% by predicted CLV account for ~63% of all actual future revenue** (a random 10% would capture ~10%); the top 20% capture **~75%**. That is a directly actionable targeting list.
+**Business impact:** the customers the model ranks in the **top 10% by predicted CLV account for ~63% of all actual future revenue** (a random 10% would capture ~10%); the top 20% capture **~75%**. That is a directly actionable targeting list.
 
 ![Revenue capture by predicted-CLV decile](images/revenue_capture_by_decile.png)
 
-### Why the linear baseline fails (and why that's a good story)
+### Why the linear baseline fails
 CLV is heavily right-skewed — most customers spend little, a few "whales" spend up to £184k. Squared-error linear regression is dominated by those outliers and returns a large negative R². This motivates a **tree-based model on a `log1p` target**, and it's why I report **MAE and revenue-capture** (robust, business-meaningful) rather than leaning on R² alone.
 
 ### What drives customer value (SHAP)
@@ -36,7 +36,7 @@ Monetary total, total quantity, recency and purchase cadence are the dominant be
 
 ---
 
-## 🧪 Methodology
+## Methodology
 1. **Cleaning** — from 1.07M raw transactions, drop missing customer IDs (~243k), cancellations (`C`-invoices), and returns/bad rows → **805,549 clean transactions (75% retained), 5,878 customers**.
 2. **Leakage-safe time split** — features come **only** from an observation window (≤ cutoff); the target is spend in the **disjoint 6-month future window** (£0 for customers who don't return — 48% of them).
 3. **Feature engineering** — RFM (recency, frequency, monetary) plus tenure, basket value, product variety, purchase cadence, and a UK flag (see [`src/clv_features.py`](src/clv_features.py)).
@@ -44,12 +44,12 @@ Monetary total, total quantity, recency and purchase cadence are the dominant be
 5. **Explainability** — SHAP `TreeExplainer` summary of behavioural drivers.
 6. **Business evaluation** — revenue-capture by predicted-CLV decile (the metric a CRM team actually cares about).
 
-## 🧰 Tech Stack
+## Tech Stack
 Python · pandas · NumPy · scikit-learn · XGBoost · SHAP · Matplotlib · Seaborn
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 ```
 ├── README.md
 ├── requirements.txt
@@ -62,7 +62,7 @@ Python · pandas · NumPy · scikit-learn · XGBoost · SHAP · Matplotlib · Se
 └── docs/
 ```
 
-## 🚀 How to Run
+## How to Run
 ```bash
 git clone https://github.com/kndukuba17-hub/predictive-clv-engine.git
 cd predictive-clv-engine
@@ -73,13 +73,7 @@ jupyter notebook notebooks/predictive_clv_engine.ipynb
 ```
 The dataset (~45 MB) is not committed; `data/README.md` has the one-step download link. Runs on Jupyter or Google Colab.
 
-## 🗺️ Roadmap
+## Roadmap
 - Rolling / multi-window validation instead of a single 6-month split.
 - Probabilistic CLV benchmark (BG/NBD + Gamma-Gamma) alongside the ML model.
 - Streamlit app: enter a customer's RFM profile → predicted CLV + SHAP explanation.
-
----
-### 🎤 Interview talking points
-- *Why did linear regression get R² of −118?* Heavy-tailed target + outlier whales; squared error is dominated by them.
-- *Why report MAE and decile-capture instead of R²?* With a heavy tail, R² is unstable across splits; these are robust and business-meaningful.
-- *How did you avoid leakage?* Strict time split — features from the observation window only, target from a disjoint future window.
